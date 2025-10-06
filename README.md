@@ -1,13 +1,50 @@
-# TrackingWorker - SOLID Architecture Learning Project
+# TrackingWorker - SOLID Architecture Web API
 
-A comprehensive C# console application built with .NET 8 that demonstrates all 5 SOLID principles through a User Management System.
+A comprehensive ASP.NET Core Web API built with .NET 8 that demonstrates all 5 SOLID principles through a User Management System.
 
 ## 🎯 What You'll Learn
 
-- **SOLID Principles** in action with real code examples
+- **SOLID Principles** in action with real Web API code
+- **ASP.NET Core** Web API development
 - **Dependency Injection** and IoC containers
+- **RESTful API design** with proper HTTP methods
+- **Swagger/OpenAPI** documentation
 - **Layered Architecture** with clean separation of concerns
-- **C# Best Practices** and professional coding patterns
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- .NET 8 SDK (already installed in this workspace)
+
+### Build and Run
+
+```bash
+# Build the project
+dotnet build TrackingWorker.csproj
+
+# Run the Web API
+dotnet run --project TrackingWorker.csproj
+```
+
+### API Endpoints
+
+Once running, access:
+
+- **API Base**: `http://localhost:5000`
+- **Hello World**: `GET http://localhost:5000/` 
+- **Swagger UI**: `http://localhost:5000/swagger`
+- **User API**: `http://localhost:5000/api/user`
+
+### Available Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/` | Hello World message |
+| GET | `/api/user` | Get all users |
+| GET | `/api/user/{id}` | Get user by ID |
+| POST | `/api/user` | Create new user |
+| DELETE | `/api/user/{id}` | Delete user |
 
 ## 🏗️ Architecture Overview
 

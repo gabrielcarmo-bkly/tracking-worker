@@ -15,6 +15,9 @@ public static class ServiceConfiguration
 {
     public static IServiceCollection ConfigureServices(this IServiceCollection services)
     {
+        // Add controllers for Web API
+        services.AddControllers();
+        
         // Register repositories
         services.AddScoped<IUserRepository, InMemoryUserRepository>();
         

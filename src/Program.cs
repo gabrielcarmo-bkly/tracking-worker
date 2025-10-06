@@ -1,82 +1,55 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using TrackingWorker.Configuration;
-using TrackingWorker.Controllers;
+﻿using TrackingWorker.Configuration;
 
-/// <summary>
-/// Main entry point demonstrating SOLID principles:
-/// - Dependency Inversion: Using DI container instead of direct instantiation
-/// - Single Responsibility: Main only handles application bootstrapping
-/// </summary>
+var builder = WebApplication.CreateBuilder(args);
 
-// Configure Dependency Injection Container
-var services = new ServiceCollection();
-services.ConfigureServices();
+// Configure URLs explicitly
+builder.WebHost.UseUrls("http://localhost:5000");
 
-// Build the service provider
-using var serviceProvider = services.BuildServiceProvider();
+// Add services to the container
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
-// Resolve dependencies (Dependency Inversion Principle)
-var userController = new UserController(serviceProvider.GetRequiredService<TrackingWorker.Services.Interfaces.IUserService>());
+// Configure our SOLID architecture services
+builder.Services.ConfigureServices();
 
-Console.WriteLine("🏗️  SOLID Architecture Demo - User Management System");
-Console.WriteLine("====================================================");
+var app = builder.Build();
 
-bool running = true;
-while (running)
+// Enable Swagger in all environments
+app.UseSwagger();
+app.UseSwaggerUI();
+
+app.UseRouting();
+
+// Hello World endpoint
+app.MapGet("/", () => "Hello World from TrackingWorker API!")
+    .WithName("GetHelloWorld");
+
+// Map controllers for User API endpoints
+app.MapControllers();
+
+Console.WriteLine("🚀 TrackingWorker API is running on http://localhost:5000");
+Console.WriteLine("📚 Swagger UI available at http://localhost:5000/swagger");
+Console.WriteLine("📄 Swagger JSON available at http://localhost:5000/swagger/v1/swagger.json");
+Console.WriteLine("💡 Press Ctrl+C to gracefully shutdown the application");
+
+// Configure graceful shutdown
+var cts = new CancellationTokenSource();
+Console.CancelKeyPress += (_, e) => {
+    e.Cancel = true; // Prevent immediate termination
+    Console.WriteLine("\n🛑 Shutdown signal received. Gracefully shutting down...");
+    cts.Cancel();
+};
+
+try
 {
-    Console.WriteLine("\nChoose an option:");
-    Console.WriteLine("1. Create User");
-    Console.WriteLine("2. View All Users");
-    Console.WriteLine("3. Get User by ID");
-    Console.WriteLine("4. Exit");
-    Console.Write("\nEnter your choice (1-4): ");
-
-    var choice = Console.ReadLine();
-
-    switch (choice)
-    {
-        case "1":
-            await userController.HandleCreateUserAsync();
-            break;
-        case "2":
-            await userController.HandleGetAllUsersAsync();
-            break;
-        case "3":
-            await userController.HandleGetUserByIdAsync();
-            break;
-        case "4":
-            running = false;
-            Console.WriteLine("👋 Goodbye!");
-            break;
-        default:
-            Console.WriteLine("❌ Invalid choice. Please try again.");
-            break;
-    }
+    await app.RunAsync(cts.Token);
 }
-
-/* 
-🎯 SOLID Principles Demonstrated:
-
-1. Single Responsibility Principle (SRP):
-   - User: Only represents user data
-   - UserService: Only handles user business logic
-   - UserRepository: Only handles data persistence
-   - UserValidator: Only handles validation logic
-
-2. Open/Closed Principle (OCP):
-   - Services are open for extension but closed for modification
-   - You can add new implementations without changing existing code
-
-3. Liskov Substitution Principle (LSP):
-   - InMemoryUserRepository can be replaced with DatabaseUserRepository
-   - Any IUserService implementation can replace UserService
-
-4. Interface Segregation Principle (ISP):
-   - Separate interfaces: IUserService, IUserRepository, IUserValidator
-   - Clients only depend on interfaces they use
-
-5. Dependency Inversion Principle (DIP):
-   - High-level modules (UserService) depend on abstractions (IUserRepository)
-   - Details (InMemoryUserRepository) depend on abstractions
-   - Dependencies are injected, not created directly
-*/
+catch (OperationCanceledException)
+{
+    Console.WriteLine("✅ Application shutdown completed.");
+}
+finally
+{
+    await app.DisposeAsync();
+}
